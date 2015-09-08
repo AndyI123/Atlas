@@ -42,6 +42,7 @@ ul, canvas {
 body, html { 
     overflow: hidden;
     height: 100%;
+    width: 100%;
     padding: 0;
     margin:0;
 }
@@ -64,9 +65,7 @@ h1 {
     display: block;
 }
 
-#bg {
-    background: url(gridbackground.png);
+#canvas {
     width:100%;
     height:100%;
-    background-size: 100px;
 }
