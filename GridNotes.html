@@ -1,0 +1,20 @@
+<head>
+  <title>GridNotes</title>
+</head>
+
+<body>
+  <h1>Welcome to GridNotes!</h1>
+  {{> notetaker }}
+  {{> notepreview}}
+</body>
+
+<template name="notetaker">
+    <form class="new-bullet">
+        <input id="newnote" type="text" name="text" placeholder="Next Point" />
+    </form>
+</template>
+
+<template name="notepreview">
+    <div id="flowContainer">
+    </div>
+</template>
