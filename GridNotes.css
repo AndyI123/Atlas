@@ -42,4 +42,31 @@ ul, canvas {
 body, html { 
     overflow: hidden;
     height: 100%;
+    padding: 0;
+    margin:0;
+}
+
+#bgImg {
+    position: absolute;
+    height: 100%;
+    z-index: -1;
+}
+
+h1 {
+    font-family: 'Muli', sans-serif;
+    margin-top: 50px;
+    margin-right: 10%;
+    margin-left: 10%;
+    width: 80%;
+    text-align: center;
+    font-size: 100px;
+    z-index: 10;
+    display: block;
+}
+
+#bg {
+    background: url(gridbackground.png);
+    width:100%;
+    height:100%;
+    background-size: 100px;
 }

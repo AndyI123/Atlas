@@ -9,3 +9,4 @@ autopublish
 insecure
 jsplumb:jsplumb
 jquery
+iron:router

@@ -1,11 +1,9 @@
 <head>
   <title>GridNotes</title>
+  <link href='https://fonts.googleapis.com/css?family=Muli' rel='stylesheet' type='text/css'>
 </head>
 
 <body>
-  <h1>Welcome to GridNotes!</h1>
-  {{> notetaker }}
-  {{> notepreview}}
 </body>
 
 <template name="notetaker">
@@ -16,5 +14,15 @@
 
 <template name="notepreview">
     <div id="flowContainer">
+    </div>
+</template>
+
+<template name="flowchart">
+    {{> notetaker }}
+    {{> notepreview}}
+</template>
+
+<template name="home">
+    <div id="bg">
     </div>
 </template>
