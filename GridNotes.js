@@ -59,8 +59,8 @@ function moveIt()
 
         // Calc growth
         rad = circs[i].attr("r");
-        if (circs[i].grow > 0) circs[i].attr("r", 20);
-        else                   circs[i].attr("r", 20);
+        if (circs[i].grow > 0) circs[i].attr("r", 10);
+        else                   circs[i].attr("r", 10);
 
         // Calc curve
         if (circs[i].curve > 0) circs[i].deg = circs[i].deg + 2;
@@ -69,11 +69,11 @@ function moveIt()
         // Calc opacity
         opa = circs[i].attr("fill-opacity");
         if (circs[i].fade > 0) {
-            circs[i].attr("fill-opacity", 1);
-            circs[i].attr("stroke-opacity", 1); }
+            circs[i].attr("fill-opacity", 0.9);
+            circs[i].attr("stroke-opacity", 0.9); }
         else {
-            circs[i].attr("fill-opacity", 1);
-            circs[i].attr("stroke-opacity", 1); }
+            circs[i].attr("fill-opacity", 0.9);
+            circs[i].attr("stroke-opacity", 0.9); }
 
         // Progress timer for particle
         circs[i].time = circs[i].time - 1;
@@ -94,21 +94,22 @@ function moveIt()
 }
 
 function startup () {
+    var num = 40;
     if(typeof Raphael !== "undefined") {
         paper = Raphael("canvas", "100%", "100%");
         circs = paper.set();
         lines = paper.set();
-        for (i = 0; i < 30; ++i) {
+        for (i = 0; i < num; ++i) {
             opa = ran(3,10)/10;
-            circs.push(paper.circle(ran(1000,2000), ran(1000,2000), 20).attr({"fill-opacity": 1, "stroke-opacity": 1}));
+            circs.push(paper.circle(ran(1000,2000), ran(1000,2000), 5).attr({"fill-opacity": 1, "stroke-opacity": 1}));
             circIds.push(randomId());
         }
-        circs.attr({fill: "#00DDAA", stroke: "#00DDAA"});
-        for (j = 0; j < 30; j++) {
+        circs.attr({fill: "#BBB", stroke: "#03A9F4", "stroke-width": 2});
+        for (j = 0; j < num; j++) {
             var circ1 = circs[j];
-            var k = rane(0,29, j);
+            var k = rane(0,num-1, j);
             var circ2 = circs[k]
-            lines.push(paper.path("M" + circ1.attr("cx").toString() + " " + circ1.attr("cy").toString() + "L" + circ2.attr("cx").toString() + " " + circ2.attr("cy").toString()).attr({stroke: "#00DDAA"}));
+            lines.push(paper.path("M" + circ1.attr("cx").toString() + " " + circ1.attr("cy").toString() + "L" + circ2.attr("cx").toString() + " " + circ2.attr("cy").toString()).attr({stroke: "#BBB", "stroke-opacity": 0.7}));
             lineIds.push([circIds[j], circIds[k]]);
             console.log(j);
         }
