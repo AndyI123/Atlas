@@ -163,7 +163,13 @@ if (Meteor.isClient) {
           });
           jsPlumb.makeSource(connect, {
               parent: newState,
-              anchor: 'Continuous'
+              anchor: 'Continuous',
+              endpoint:{
+                  connectorOverlays:[ 
+                      [ "Arrow", { width:10, length:30, location:1, id:"arrow" } ], 
+                      [ "Label", { label:"foo", id:"label" } ]
+                  ]
+              }
           });
           jsPlumb.draggable(newState, {
               containment: 'parent'

@@ -2,6 +2,7 @@
   <title>GridNotes</title>
   <link href='https://fonts.googleapis.com/css?family=Muli' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -9,7 +10,10 @@
 
 <template name="notetaker">
     <form class="new-bullet">
-        <input id="newnote" type="text" name="text" placeholder="Next Point" />
+        <div id="formdiv">
+            <input id="newnote" type="text" name="text" placeholder="Next Point" />
+            <i class="fa fa-camera"></i>
+        </div>
     </form>
 </template>
 
@@ -27,8 +31,8 @@
     <h1>Atlas</h1>
     <h2>Mapping a world of knowledge.</h2>
     <div id="buttondiv">
-        <button>Explore</button>
-        <button>Add to the map</button>
+        <a href="#" class="button">Explore</a>
+        <a href="/flowchart" class="button">Add to the map</a>
     </div>
     <div id="canvas">
     </div>
