@@ -118,6 +118,17 @@ a.button:hover {
     text-align: center;
 }
 
+.faitem{
+    font-size: 40px !important;
+    padding:10px;
+    color: #445566;
+    background-color:#212121;
+    background-clip: padding-box;  
+    -moz-background-clip: padding;  
+    -webkit-background-clip: padding;
+    border-radius: 30px;
+}
+
 input[type=text] {
     border: 2px #03A9F4 solid;
     background-color: #212121;

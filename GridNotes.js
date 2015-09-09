@@ -1,6 +1,7 @@
 /**Utitlity functions**/
 var paper, circs, i, nowX, nowY, timer, props = {}, toggler = 0, elie, dx, dy, rad, cur, opa, c, lines, lineIds, circIds;
 
+var faIcons = ["fa-umbrella", "fa-clock-o", "fa-arrows-h"]
 circIds = [];
 lineIds = []
 
@@ -127,21 +128,45 @@ Router.route("/", function() {
     this.render("home")
 })
 
-
 if (Meteor.isClient) {
   var startLocation = [-1, -1];
   Meteor.startup(function () {
       jsPlumb.ready(function() {
           jsPlumb.setContainer($("#flowContainer"));
+          jsPlumb.bind("click", function (connection, e) {
+              e.preventDefault();
+              var thisObj = $(connection.getElement()).find("i")
+              console.log(thisObj);
+              for(k = 0; k < faIcons.length; k++) {
+                  if(thisObj.hasClass(faIcons[k])) {
+                      thisObj.removeClass(faIcons[k]);
+                      console.log((k+1) % (faIcons.length));
+                      thisObj.addClass(faIcons[(k+1) % (faIcons.length)])
+                      break;
+                  }
+              }
+          });
+          jsPlumb.bind("contextmenu", function(connection, e) {
+              jsPlumb.detach(connection.component);
+              e.preventDefault();
+          })
       });
       $("#defaultradio").attr('checked', true);
+      $("#faitem").click(function() {
+          console.log("Hello");
+      })
   });
     
   Template.home.onRendered(function() {
       startup();
   });
-  
-  
+    
+  Template.flowchart.events({
+      'mouseover .overlayItem': function (e) {
+          console.log("Clicked");
+      }
+  })
+    
   Template.notetaker.events({
       'submit .new-bullet' : function (e) {
           e.preventDefault();
@@ -164,12 +189,13 @@ if (Meteor.isClient) {
           jsPlumb.makeSource(connect, {
               parent: newState,
               anchor: 'Continuous',
-              endpoint:{
-                  connectorOverlays:[ 
-                      [ "Arrow", { width:10, length:30, location:1, id:"arrow" } ], 
-                      [ "Label", { label:"foo", id:"label" } ]
-                  ]
-              }
+              connectorOverlays: [["Custom", {
+                  create: function(component) {
+                      return $('<div>').css({"border": "4px solid #445566", "border-radius": "50px", "background-clip": "padding-box"}).append($("<i>").addClass("fa fa-umbrella faitem"))
+                  },
+                  cssClass: "overlayItem"
+              }]],
+              endpoint: ["Rectangle", { width:10, height:10 }]
           });
           jsPlumb.draggable(newState, {
               containment: 'parent'
