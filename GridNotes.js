@@ -9,6 +9,8 @@ function randomId() {
     return '_' + Math.random().toString(36).substr(2, 9);
 }
 
+allWebs = new Mongo.collection("webs");
+
 function rane(min, max, except) {
     var a = Math.floor(Math.random() * (max - min + 1)) + min; 
     while (a == except) {
@@ -122,6 +124,40 @@ function startup () {
     }
 }
 
+function newBlock(content) {
+    var newState = $('<div>').attr('id', randomId()).addClass('item');
+    var title = $('<div>').addClass('title').text($("#newnote").val());
+    var connect = $('<div>').addClass('connect');
+
+    newState.css({
+        'top': document.pageY,
+        'left': document.pageX
+    });
+
+    newState.append(connect);
+    connect.append(title)
+
+    $('#flowContainer').append(newState);
+    jsPlumb.makeTarget(newState, {
+        anchor: 'Continuous'
+    });
+    jsPlumb.makeSource(connect, {
+        parent: newState,
+        anchor: 'Continuous',
+        connectorOverlays: [["Custom", {
+            create: function(component) {
+                return $('<div>').css({"border": "4px solid #445566", "border-radius": "50px", "background-clip": "padding-box"}).append($("<i>").addClass("fa fa-umbrella faitem"))
+            },
+            cssClass: "overlayItem"
+        }]],
+        endpoint: ["Rectangle", { width:10, height:10 }]
+    });
+    jsPlumb.draggable(newState, {
+        containment: 'parent'
+    });
+    $("#newnote").val("");
+}
+
 Router.route("/flowchart");
 Router.route("/", function() {
     this.render("home")
@@ -174,43 +210,21 @@ if (Meteor.isClient) {
       startup();
   });
     
-  Template.flowchart.events({ 
+  Template.body.helpers({ 
+      
   })
-    
+  
+  Template.notetaker.onRendered(function() {
+      web = new Mongo.collection(randomId());
+  })
+  
   Template.notetaker.events({
       'submit .new-bullet' : function (e) {
           e.preventDefault();
-          var newState = $('<div>').attr('id', randomId()).addClass('item');
-          var title = $('<div>').addClass('title').text($("#newnote").val());
-          var connect = $('<div>').addClass('connect');
-
-          newState.css({
-              'top': e.pageY,
-              'left': e.pageX
+          web.insert({
+              id: randomId(),
+              text: $("#newnote").val()
           });
-
-          newState.append(connect);
-          connect.append(title)
-
-          $('#flowContainer').append(newState);
-          jsPlumb.makeTarget(newState, {
-              anchor: 'Continuous'
-          });
-          jsPlumb.makeSource(connect, {
-              parent: newState,
-              anchor: 'Continuous',
-              connectorOverlays: [["Custom", {
-                  create: function(component) {
-                      return $('<div>').css({"border": "4px solid #445566", "border-radius": "50px", "background-clip": "padding-box"}).append($("<i>").addClass("fa fa-umbrella faitem"))
-                  },
-                  cssClass: "overlayItem"
-              }]],
-              endpoint: ["Rectangle", { width:10, height:10 }]
-          });
-          jsPlumb.draggable(newState, {
-              containment: 'parent'
-          });
-          $("#newnote").val("");
       }
   });
 }
