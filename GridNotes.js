@@ -211,7 +211,7 @@ if (Meteor.isClient) {
   });
     
   Template.body.helpers({ 
-      
+      objects: 
   })
   
   Template.notetaker.onRendered(function() {
