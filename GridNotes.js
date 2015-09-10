@@ -1,9 +1,15 @@
 /**Utitlity functions**/
 var paper, circs, i, nowX, nowY, timer, props = {}, toggler = 0, elie, dx, dy, rad, cur, opa, c, lines, lineIds, circIds;
 
+var elements = [];
+var connections = [];
+var connectionTypes = [];
+
 var faIcons = ["fa-umbrella", "fa-clock-o", "fa-arrows-h"]
 circIds = [];
-lineIds = []
+lineIds = [];
+
+Webs = new Mongo.Collection("webs");
 
 function randomId() {
     return '_' + Math.random().toString(36).substr(2, 9);
@@ -26,10 +32,8 @@ function moveIt()
 {
     var thisWidth = document.getElementById("canvas").getBoundingClientRect().width;
     var thisHeight = document.getElementById("canvas").getBoundingClientRect().height;
-    //c.attr("path", "M" + ran(10, 100).toString() + " " + ran(10, 100).toString() + "L" + ran(100, 200).toString() + " " + ran(100, 200).toString());
     for(i = 0; i < circs.length; ++i)
     {
-        // Reset when time is at zero
         if (! circs[i].time) 
         {
             circs[i].time  = ran(30, 100);
@@ -174,7 +178,20 @@ if (Meteor.isClient) {
       startup();
   });
     
-  Template.flowchart.events({ 
+  Template.flowchart.onRendered(function () {
+      var webs = Webs.find({});
+      if(webs.length > 0) {
+          var web = webs[0];
+          elements = web["elements"];
+          connections = web["connections"];
+          connectionTypes = web["connectionTypes"];
+      } else {
+          Webs.insert({
+              elements: [],
+              connections: [],
+              connectionTypes: []
+          });
+      }
   })
     
   Template.notetaker.events({
@@ -187,6 +204,12 @@ if (Meteor.isClient) {
           newState.css({
               'top': e.pageY,
               'left': e.pageX
+          });
+          
+          elements.push({
+              text: $("#newnote").val(),
+              top: ran(0,1000),
+              left:ran(0, 1000)
           });
 
           newState.append(connect);
