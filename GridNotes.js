@@ -5,7 +5,6 @@ var faIcons = ["fa-umbrella", "fa-clock-o", "fa-arrows-h"]
 circIds = [];
 lineIds = []
 
-
 function randomId() {
     return '_' + Math.random().toString(36).substr(2, 9);
 }
@@ -149,7 +148,21 @@ if (Meteor.isClient) {
           jsPlumb.bind("contextmenu", function(connection, e) {
               jsPlumb.detach(connection.component);
               e.preventDefault();
-          })
+          });
+          jsPlumb.bind("connectionDrag", function(params) {
+              $("#linker").addClass("dragging");
+              return {};
+          });
+          jsPlumb.bind("beforeDrop", function(info) {
+              console.log("test")
+              $("#linker").removeClass("dragging");
+              return {};
+          });
+          jsPlumb.bind("connectionDetached", function(info) {
+              console.log("test")
+              $("#linker").removeClass("dragging");
+              return {};
+          });
       });
       $("#defaultradio").attr('checked', true);
       $("#faitem").click(function() {
@@ -161,10 +174,7 @@ if (Meteor.isClient) {
       startup();
   });
     
-  Template.flowchart.events({
-      'mouseover .overlayItem': function (e) {
-          console.log("Clicked");
-      }
+  Template.flowchart.events({ 
   })
     
   Template.notetaker.events({
