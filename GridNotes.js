@@ -1,15 +1,12 @@
 /**Utitlity functions**/
 var paper, circs, i, nowX, nowY, timer, props = {}, toggler = 0, elie, dx, dy, rad, cur, opa, c, lines, lineIds, circIds;
 
-var elements = [];
-var connections = [];
-var connectionTypes = [];
-
 var faIcons = ["fa-umbrella", "fa-clock-o", "fa-arrows-h"]
 circIds = [];
 lineIds = [];
-
-Webs = new Mongo.Collection("webs");
+thisId = randomId()
+Elements = new Mongo.Collection("elements");
+Connections = new Mongo.Collection("connections");
 
 function randomId() {
     return '_' + Math.random().toString(36).substr(2, 9);
@@ -27,6 +24,48 @@ function ran(min, max)
 {  
     return Math.floor(Math.random() * (max - min + 1)) + min;  
 } 
+
+function saveFlowchart() {
+    var elements = []
+    $(".item").each(function(index, element) {
+        elements.push({
+            id: element.id,
+            text: $(element).find(".title").text(),
+            top: element.getBoundingClientRect().top,
+            left: element.getBoundingClientRect().left
+        })
+    });
+    
+    var connections = []
+    var currentConnections = jsPlumb.getConnections();
+    for(var i = 0; i < currentConnections.length; i++) {
+        var thisType = 2
+        var classNames =  currentConnections[i].getOverlay().canvas.childNodes[0].className.split(" ")
+        if(classNames.indexOf("fa-umbrella") > -1) {
+            thisType = 0;
+        }
+        else if(classNames.indexOf("fa-clock-o") > -1) {
+            thisType = 1;
+        }
+        connections.push({
+            sourceId: currentConnections[i].source.id,
+            targetId: currentConnections[i].target.id,
+            connectionType: thisType
+        })
+    }
+    Elements.upsert({
+        _id: thisId
+    },
+    {$set: {
+        elements: elements
+    }});
+    Connections.upsert({
+        _id: thisId
+    },
+    {$set: {
+        connections: connections
+    }});
+}
 
 function moveIt()
 {
@@ -134,6 +173,7 @@ Router.route("/", function() {
 if (Meteor.isClient) {
   var startLocation = [-1, -1];
   Meteor.startup(function () {
+      Meteor.setInterval(saveFlowchart, 2000)
       jsPlumb.ready(function() {
           jsPlumb.setContainer($("#flowContainer"));
           jsPlumb.bind("click", function (connection, e) {
@@ -178,22 +218,6 @@ if (Meteor.isClient) {
       startup();
   });
     
-  Template.flowchart.onRendered(function () {
-      var webs = Webs.find({});
-      if(webs.length > 0) {
-          var web = webs[0];
-          elements = web["elements"];
-          connections = web["connections"];
-          connectionTypes = web["connectionTypes"];
-      } else {
-          Webs.insert({
-              elements: [],
-              connections: [],
-              connectionTypes: []
-          });
-      }
-  })
-    
   Template.notetaker.events({
       'submit .new-bullet' : function (e) {
           e.preventDefault();
@@ -204,12 +228,6 @@ if (Meteor.isClient) {
           newState.css({
               'top': e.pageY,
               'left': e.pageX
-          });
-          
-          elements.push({
-              text: $("#newnote").val(),
-              top: ran(0,1000),
-              left:ran(0, 1000)
           });
 
           newState.append(connect);
