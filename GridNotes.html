@@ -26,6 +26,9 @@
     {{> notetaker }}
     {{> notepreview}}
     {{> weblinker }}
+    {{#if idassigned}}
+        {{> choosechart }}
+    {{/if}}
 </template>
 
 <template name="weblinker">
@@ -42,5 +45,17 @@
         <a href="/flowchart" class="button">Add to the map</a>
     </div>
     <div id="canvas">
+    </div>
+</template>
+
+<template name="choosechart">
+    <div id="background"></div>
+    <div id="bgform">
+        <form id="idform">
+            <input type="text" name="flowchartid" id="idtf" />
+            <input type="password" name="password" id="pwdtf" />
+            <button id="newchart">New Note</button>
+            <button id="joinchart">Edit Note</button>
+         </form>
     </div>
 </template>

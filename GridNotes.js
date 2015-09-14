@@ -4,9 +4,17 @@ var paper, circs, i, nowX, nowY, timer, props = {}, toggler = 0, elie, dx, dy, r
 var faIcons = ["fa-umbrella", "fa-clock-o", "fa-arrows-h"]
 circIds = [];
 lineIds = [];
-thisId = randomId()
+thisId = ""
 Elements = new Mongo.Collection("elements");
 Connections = new Mongo.Collection("connections");
+Webs = new Mongo.Collection("webs");
+
+function idExists() {
+    Session.set("idExists", false);
+    if(thisId !== "") {
+        Session.set("idExists", true);
+    }
+}
 
 function randomId() {
     return '_' + Math.random().toString(36).substr(2, 9);
@@ -53,18 +61,20 @@ function saveFlowchart() {
             connectionType: thisType
         })
     }
-    Elements.upsert({
-        _id: thisId
-    },
-    {$set: {
-        elements: elements
-    }});
-    Connections.upsert({
-        _id: thisId
-    },
-    {$set: {
-        connections: connections
-    }});
+    if(thisId !== "") {
+        Elements.upsert({
+            _id: thisId
+        },
+        {$set: {
+            elements: elements
+        }});
+        Connections.upsert({
+            _id: thisId
+        },
+        {$set: {
+            connections: connections
+        }});
+    }
 }
 
 function moveIt()
@@ -173,7 +183,6 @@ Router.route("/", function() {
 if (Meteor.isClient) {
   var startLocation = [-1, -1];
   Meteor.startup(function () {
-      Meteor.setInterval(saveFlowchart, 2000)
       jsPlumb.ready(function() {
           jsPlumb.setContainer($("#flowContainer"));
           jsPlumb.bind("click", function (connection, e) {
@@ -217,6 +226,95 @@ if (Meteor.isClient) {
   Template.home.onRendered(function() {
       startup();
   });
+
+  Template.choosechart.events({
+      'submit #idform' : function (e) {
+          e.preventDefault();
+      },
+      
+      'click #newchart' : function (e) {
+          if(Webs.find({id: $("#idtf").val()}).count() > 0) {
+              alert("This name already exists, try again.");
+              $("#pwdtf").val("");
+          }
+          else {
+              thisId = $("#idtf").val();
+              idExists();
+              Webs.insert({
+                  id: thisId,
+                  password: $("#pwdtf").val()
+              });
+          }
+          Meteor.setInterval(saveFlowchart, 2000)
+      },
+      
+      'click #joinchart' : function (e) {
+          if(Webs.find({id: $("#idtf").val()}).count() == 0) {
+              alert("This note does not exist, try again.");
+              $("#pwdtf").val("")
+          }
+          else {
+              thisId = $("#idtf").val();
+              idExists()
+              var elements = Elements.find({_id: thisId}).fetch()[0].elements;
+              console.log(elements);
+              var connections = Connections.find({_id:thisId}).fetch()[0].connections;
+              for(var i = 0; i < elements.length; i++) {
+                  var element = elements[i];
+                  console.log(element.id);
+                  var newState = $('<div>').attr('id', element.id).addClass('item');
+                  var title = $('<div>').addClass('title').text(element.text);
+                  var connect = $('<div>').addClass('connect');
+
+                  newState.css({
+                      'top': element.top,
+                      'left': element.left
+                  });
+
+                  newState.append(connect);
+                  connect.append(title);
+                  $('#flowContainer').append(newState);
+                  jsPlumb.makeTarget(newState, {
+                      anchor: 'Continuous'
+                  });
+                  jsPlumb.makeSource(connect, {
+                      parent: newState,
+                      anchor: 'Continuous',
+                      connectorOverlays: [["Custom", {
+                          create: function(component) {
+                              return $('<div>').css({"border": "4px solid #445566", "border-radius": "50px", "background-clip": "padding-box"}).append($("<i>").addClass("fa fa-umbrella faitem"))
+                          },
+                          cssClass: "overlayItem"
+                      }]],
+                      endpoint: ["Rectangle", { width:10, height:10 }]
+                  });
+                  jsPlumb.draggable(newState, {
+                      containment: 'parent'
+                  });
+              }
+              for(var j = 0; j < connections.length; j++) {
+                  var connection = connections[j]
+                  jsPlumb.connect({
+                      source: connection.sourceId,
+                      target: connection.targetId,
+                      overlays: [["Custom", {
+                          create: function(component) {
+                              return $('<div>').css({"border": "4px solid #445566", "border-radius": "50px", "background-clip": "padding-box"}).append($("<i>").addClass("fa " + faIcons[connection.connectionType] + " faitem"))
+                          },
+                          cssClass: "overlayItem"
+                      }]],
+                  })
+              }
+              Meteor.setInterval(saveFlowchart, 2000)
+          }
+      }
+  })
+  
+  Template.flowchart.helpers({
+      idassigned: function() {
+          return !Session.get("idExists");
+      }
+  });
     
   Template.notetaker.events({
       'submit .new-bullet' : function (e) {
@@ -242,7 +340,7 @@ if (Meteor.isClient) {
               anchor: 'Continuous',
               connectorOverlays: [["Custom", {
                   create: function(component) {
-                      return $('<div>').css({"border": "4px solid #445566", "border-radius": "50px", "background-clip": "padding-box"}).append($("<i>").addClass("fa fa-umbrella faitem"))
+                      return $('<div>').css({"border": "4px solid #445566", "border-radius": "50px", "background-clip": "padding-box"}).append($("<i>").addClass("fa" + "faitem"))
                   },
                   cssClass: "overlayItem"
               }]],
