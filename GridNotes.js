@@ -253,6 +253,10 @@ if (Meteor.isClient) {
               alert("This note does not exist, try again.");
               $("#pwdtf").val("")
           }
+          else if(Webs.find({id: $("#idtf").val(), password: $("#pwdtf").val()}).count() == 0) {
+              alert("Wrong password, please try again.");
+              $("#pwdtf".val(""));
+          }
           else {
               thisId = $("#idtf").val();
               idExists()
